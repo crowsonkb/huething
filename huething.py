@@ -4,12 +4,16 @@ import argparse
 import colour
 import json
 import requests
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-b', '--brightness',
     help='the brightness scaling factor',
     default=1.,
     type=float)
+parser.add_argument('-d', '--debug',
+    help='print debug information',
+    action='store_true')
 parser.add_argument('--host',
     help='the hostname/ip of the philips hue bridge',
     default='philips-hue')
@@ -24,8 +28,13 @@ parser.add_argument('-u', '--username',
 args = parser.parse_args()
 endpoint = 'http://{}/api/{}'.format(args.host, args.username)
 
-# TODO: check return status code, content, etc. What follows is basically only
-# a test.
+def request(method, path, data=''):
+    if args.debug:
+        sys.stderr.write('{} {} {}\n'.format(method.func_name, path, data))
+    response = method(endpoint+path, data=data)
+    if args.debug:
+        sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
+    return response
 
 # The first value in each tuple is the brightness scaling to apply. The second
 # value is the mired shift to apply. Light 4 is the reference light because it
@@ -44,6 +53,6 @@ for setting in settings:
     computed_params.append({'bri': bri, 'xy': colour.CCT_to_xy(ct)})
 
 for index, param in enumerate(computed_params):
-    url = '{}/lights/{}/state'.format(endpoint, index+1)
+    path = '/lights/{}/state'.format(index+1)
     data = json.dumps(param)
-    requests.put(url, data=data)
+    request(requests.put, path, data)
