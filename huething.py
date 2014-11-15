@@ -21,6 +21,10 @@ parser.add_argument('-k', '--temperature',
     help='the color temperature in kelvins',
     default=4000.,
     type=float)
+parser.add_argument('-t', '--transition-time',
+    help='the transition time in seconds',
+    default=0.4,
+    type=float)
 parser.add_argument('-u', '--username',
     help='the username to act as when interacting with the bridge',
     required=True)
@@ -50,7 +54,11 @@ computed_params = []
 for setting in settings:
     bri = min(255, int(args.brightness * setting[0] * 255))
     ct = 1000000. / (1000000./args.temperature + setting[1])
-    computed_params.append({'bri': bri, 'xy': colour.CCT_to_xy(ct)})
+    computed_params.append({
+            'bri': bri,
+            'xy': colour.CCT_to_xy(ct),
+            'transitiontime': int(args.transition_time*10)
+        })
 
 for index, param in enumerate(computed_params):
     path = '/lights/{}/state'.format(index+1)
