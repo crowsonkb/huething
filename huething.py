@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import colour
@@ -34,7 +34,7 @@ endpoint = 'http://{}/api/{}'.format(args.host, args.username)
 
 def request(method, path, data=''):
     if args.debug:
-        sys.stderr.write('{} {} {}\n'.format(method.func_name, path, data))
+        sys.stderr.write('{} {} {}\n'.format(method.__name__, path, data))
     response = method(endpoint+path, data=data)
     if args.debug:
         sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
