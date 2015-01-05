@@ -31,7 +31,7 @@ def request(method, path, data=''):
         sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
     return response
 
-def main():
+def init_state():
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--brightness',
                         help='the brightness scaling factor',
@@ -54,6 +54,9 @@ def main():
 
     __S.args = parser.parse_args()
     __S.endpoint = 'http://{}/api/{}'.format(__S.args.host, __S.args.username)
+
+def main():
+    init_state()
 
     computed_params = []
     for setting in SETTINGS:
