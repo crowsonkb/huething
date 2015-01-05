@@ -5,6 +5,15 @@ This is a work in progress to control my four Philips Hue bulbs. It does not cur
 
 It does not currently handle errors properly. You can use the `-d` flag to see if there were any failed REST requests.
 
+Dependencies
+------------
+
+- [Python](https://www.python.org) >= 3.4
+- [colour](http://colour-science.org)
+- [requests](http://docs.python-requests.org/en/latest/)
+
+Usage
+-----
 ```
 usage: huething.py [-h] [-b BRIGHTNESS] [-d] [--host HOST] [-k TEMPERATURE]
                    [-t TRANSITION_TIME] -u USERNAME
