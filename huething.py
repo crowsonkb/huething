@@ -23,54 +23,46 @@ SETTINGS = [
 
 class State():
     def __init__(self):
-        self.args = None
-        self.endpoint = None
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-b', '--brightness',
+                            help='the brightness scaling factor',
+                            default=1., type=float)
+        parser.add_argument('-d', '--debug',
+                            help='print debug information',
+                            action='store_true')
+        parser.add_argument('--host',
+                            help='the hostname/ip of the philips hue bridge',
+                            default='philips-hue')
+        parser.add_argument('-k', '--temperature',
+                            help='the color temperature in kelvins',
+                            default=4000., type=float)
+        parser.add_argument('-t', '--transition-time',
+                            help='the transition time in seconds',
+                            default=0.4, type=float)
+        parser.add_argument('-u', '--username',
+                            help='the username to act as when interacting with the bridge',
+                            required=True)
 
-__S = State()
+        self.args = parser.parse_args()
+        self.endpoint = 'http://{}/api/{}'.format(self.args.host, self.args.username)
 
 def request(method, path, data=''):
-    if __S.args.debug:
+    if S.args.debug:
         sys.stderr.write('{} {} {}\n'.format(method.__name__, path, data))
-    response = method(__S.endpoint+path, data=data)
-    if __S.args.debug:
+    response = method(S.endpoint+path, data=data)
+    if S.args.debug:
         sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
     return response
 
-def init_state():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--brightness',
-                        help='the brightness scaling factor',
-                        default=1., type=float)
-    parser.add_argument('-d', '--debug',
-                        help='print debug information',
-                        action='store_true')
-    parser.add_argument('--host',
-                        help='the hostname/ip of the philips hue bridge',
-                        default='philips-hue')
-    parser.add_argument('-k', '--temperature',
-                        help='the color temperature in kelvins',
-                        default=4000., type=float)
-    parser.add_argument('-t', '--transition-time',
-                        help='the transition time in seconds',
-                        default=0.4, type=float)
-    parser.add_argument('-u', '--username',
-                        help='the username to act as when interacting with the bridge',
-                        required=True)
-
-    __S.args = parser.parse_args()
-    __S.endpoint = 'http://{}/api/{}'.format(__S.args.host, __S.args.username)
-
 def main():
-    init_state()
-
     computed_params = []
     for setting in SETTINGS:
-        bri = min(255, int(__S.args.brightness * setting[0] * 255))
-        ct = 1000000. / (1000000./__S.args.temperature + setting[1])
+        bri = min(255, int(S.args.brightness * setting[0] * 255))
+        ct = 1000000. / (1000000./S.args.temperature + setting[1])
         computed_params.append({
             'bri': bri,
             'xy': colour.CCT_to_xy(ct),
-            'transitiontime': int(__S.args.transition_time*10)
+            'transitiontime': int(S.args.transition_time*10)
         })
 
     for index, param in enumerate(computed_params):
@@ -79,4 +71,5 @@ def main():
         request(requests.put, path, data)
 
 if __name__ == '__main__':
+    S = State()
     main()
