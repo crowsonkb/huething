@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 
+"""This is a work in progress to control my four Philips Hue bulbs. It does not
+currently support many capabilities of the Philips Hue system, but may be useful
+as an example or proof of concept.
+"""
+
 import argparse
 import colour
 import json
 import requests
 import sys
 
-# The first value in each tuple is the brightness scaling to apply. The second
-# value is the mired shift to apply. Light 4 is the reference light because it
-# is a bare bulb. The others need mired shift applied due to lampshades.
+#: The first value in each tuple is the brightness scaling to apply. The second
+#: value is the mired shift to apply. Light 4 is the reference light because it
+#: is a bare bulb. The others need mired shift applied due to lampshades.
 SETTINGS = [
     (1.0, -25),
     (1.0, -25),
