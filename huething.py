@@ -26,7 +26,7 @@ class State():
         parser = argparse.ArgumentParser()
         parser.add_argument('-b', '--brightness',
                             help='the brightness scaling factor',
-                            default=1., type=float)
+                            default=1, type=float)
         parser.add_argument('-d', '--debug',
                             help='print debug information',
                             action='store_true')
@@ -35,7 +35,7 @@ class State():
                             default='philips-hue')
         parser.add_argument('-k', '--temperature',
                             help='the color temperature in kelvins',
-                            default=4000., type=float)
+                            default=4000, type=float)
         parser.add_argument('-t', '--transition-time',
                             help='the transition time in seconds',
                             default=0.4, type=float)
@@ -58,7 +58,7 @@ def main():
     computed_params = []
     for setting in SETTINGS:
         bri = min(255, int(S.args.brightness * setting[0] * 255))
-        ct = 1000000. / (1000000./S.args.temperature + setting[1])
+        ct = 1000000 / (1000000/S.args.temperature + setting[1])
         computed_params.append({
             'bri': bri,
             'xy': colour.CCT_to_xy(ct),
