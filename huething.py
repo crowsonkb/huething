@@ -30,6 +30,9 @@ class State():
         parser.add_argument('-d', '--debug',
                             help='print debug information',
                             action='store_true')
+        parser.add_argument('--dry-run',
+                            help='just print what actions would be taken',
+                            action='store_true')
         parser.add_argument('--host',
                             help='the hostname/ip of the philips hue bridge',
                             default='philips-hue')
@@ -47,12 +50,14 @@ class State():
         self.endpoint = 'http://{}/api/{}'.format(self.args.host, self.args.username)
 
 def request(method, path, data=''):
-    if S.args.debug:
+    if S.args.debug or S.args.dry_run:
         sys.stderr.write('{} {} {}\n'.format(method.__name__, path, data))
-    response = method(S.endpoint+path, data=data)
-    if S.args.debug:
-        sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
-    return response
+    if not S.args.dry_run:
+        response = method(S.endpoint+path, data=data)
+        if S.args.debug:
+            sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
+        return response
+    return None
 
 def main():
     computed_params = []
