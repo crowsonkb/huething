@@ -66,6 +66,7 @@ def main():
         ct = 1000000 / (1000000/S.args.temperature + setting[1])
         computed_params.append({
             'bri': bri,
+            'on': True,
             'xy': colour.CCT_to_xy(ct),
             'transitiontime': int(S.args.transition_time*10)
         })
