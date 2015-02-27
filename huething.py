@@ -6,10 +6,12 @@ as an example or proof of concept.
 """
 
 import argparse
-import colour
 import json
-import requests
+import pprint
 import sys
+
+import colour
+import requests
 
 #: The first value in each tuple is the brightness scaling to apply. The second
 #: value is the mired shift to apply. Light 4 is the reference light because it
@@ -32,6 +34,9 @@ class State():
                             action='store_true')
         parser.add_argument('--dry-run',
                             help='just print what actions would be taken',
+                            action='store_true')
+        parser.add_argument('--dump',
+                            help='dump out complete lighting state',
                             action='store_true')
         parser.add_argument('--host',
                             help='the hostname/ip of the philips hue bridge',
@@ -59,7 +64,16 @@ def request(method, path, data=''):
         return response
     return None
 
+def dump():
+    response = request(requests.get, '')
+    data = response.json()
+    pprint.pprint(data)
+
 def main():
+    if S.args.dump:
+        dump()
+        return
+
     computed_params = []
     for setting in SETTINGS:
         bri = min(255, int(S.args.brightness * setting[0] * 255))
