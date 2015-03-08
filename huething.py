@@ -17,10 +17,10 @@ import requests
 #: value is the mired shift to apply. Light 4 is the reference light because it
 #: is a bare bulb. The others need mired shift applied due to lampshades.
 SETTINGS = [
-    (1.0, -25),
-    (1.0, -25),
-    (0.7, -5),
-    (0.63, 0)
+    (0.7, -25, True),
+    (1.0, -25, True),
+    (0.7, -5, True),
+    (0.63, 0, True)
 ]
 
 class State():
@@ -79,8 +79,8 @@ def main():
         bri = min(255, int(S.args.brightness * setting[0] * 255))
         ct = 1000000 / (1000000/S.args.temperature + setting[1])
         computed_params.append({
+            'on': setting[2],
             'bri': bri,
-            'on': True,
             'xy': colour.CCT_to_xy(ct),
             'transitiontime': int(S.args.transition_time*10)
         })
