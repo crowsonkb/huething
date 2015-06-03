@@ -87,7 +87,7 @@ def main():
 
     for index, param in enumerate(computed_params):
         path = '/lights/{}/state'.format(index+1)
-        data = json.dumps(param)
+        data = json.dumps(param, default=list)
         request(requests.put, path, data)
 
 if __name__ == '__main__':
