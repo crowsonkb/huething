@@ -17,7 +17,7 @@ import requests
 #: value is the mired shift to apply. Light 4 is the reference light because it
 #: is a bare bulb. The others need mired shift applied due to lampshades.
 SETTINGS = [
-    (0.7, -25, True),
+    (1.0, -25, True),
     (1.0, -25, True),
     (0.7, -5, True),
     (0.63, 0, True)
