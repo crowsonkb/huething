@@ -1,0 +1,3 @@
+[submodule "qhue"]
+	path = qhue
+	url = https://github.com/crowsonkb/qhue

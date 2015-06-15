@@ -12,6 +12,7 @@ import sys
 
 import colour
 import requests
+from qhue import qhue
 
 #: The first value in each tuple is the brightness scaling to apply. The second
 #: value is the mired shift to apply. Light 4 is the reference light because it
@@ -29,12 +30,12 @@ class State():
         parser.add_argument('-b', '--brightness',
                             help='the brightness scaling factor',
                             default=1, type=float)
-        parser.add_argument('-d', '--debug',
-                            help='print debug information',
-                            action='store_true')
-        parser.add_argument('--dry-run',
-                            help='just print what actions would be taken',
-                            action='store_true')
+        # parser.add_argument('-d', '--debug',
+        #                     help='print debug information',
+        #                     action='store_true')
+        # parser.add_argument('--dry-run',
+        #                     help='just print what actions would be taken',
+        #                     action='store_true')
         parser.add_argument('--dump',
                             help='dump out complete lighting state',
                             action='store_true')
@@ -52,43 +53,30 @@ class State():
                             required=True)
 
         self.args = parser.parse_args()
-        self.endpoint = 'http://{}/api/{}'.format(self.args.host, self.args.username)
+        self.bridge = qhue.Bridge(self.args.host, self.args.username)
 
-def request(method, path, data=''):
-    if S.args.debug or S.args.dry_run:
-        sys.stderr.write('{} {} {}\n'.format(method.__name__, path, data))
-    if not S.args.dry_run:
-        response = method(S.endpoint+path, data=data)
-        if S.args.debug:
-            sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
-        return response
-    return None
-
-def dump():
-    response = request(requests.get, '')
-    data = response.json()
-    pprint.pprint(data)
+# def request(method, path, data=''):
+#     if S.args.debug or S.args.dry_run:
+#         sys.stderr.write('{} {} {}\n'.format(method.__name__, path, data))
+#     if not S.args.dry_run:
+#         response = method(S.endpoint+path, data=data)
+#         if S.args.debug:
+#             sys.stderr.write('{} {}\n'.format(response.status_code, response.text))
+#         return response
+#     return None
 
 def main():
     if S.args.dump:
-        dump()
+        pprint.pprint(S.bridge())
         return
 
-    computed_params = []
-    for setting in SETTINGS:
-        bri = min(255, int(S.args.brightness * setting[0] * 255))
-        ct = 1000000 / (1000000/S.args.temperature + setting[1])
-        computed_params.append({
-            'on': setting[2],
-            'bri': bri,
-            'xy': colour.CCT_to_xy(ct),
-            'transitiontime': int(S.args.transition_time*10)
-        })
-
-    for index, param in enumerate(computed_params):
-        path = '/lights/{}/state'.format(index+1)
-        data = json.dumps(param, default=list)
-        request(requests.put, path, data)
+    for light, setting in enumerate(SETTINGS):
+        print(S.bridge.lights[light+1].state(
+            transitiontime=int(S.args.transition_time*10),
+            on=setting[2],
+            bri=min(254, int(S.args.brightness * setting[0] * 254)),
+            xy=colour.CCT_to_xy(1e6 / (1e6/S.args.temperature + setting[1]))
+        ))
 
 if __name__ == '__main__':
     S = State()
